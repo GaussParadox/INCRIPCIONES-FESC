@@ -3,8 +3,10 @@ import { RecentTransactions } from "@/components/recent-transactions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { UserPlusIcon, UsersIcon, UserXIcon, WalletIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col p-4 gap-4">
       <div>
@@ -14,6 +16,12 @@ const Dashboard = () => {
         <p className="text-muted-foreground">
           Overview of your platform statistics and performance.
         </p>
+        <button
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={() => navigate("/form")}
+        >
+          Ir al Formulario
+        </button>
       </div>
 
       <Tabs defaultValue="daily" className="space-y-4">
