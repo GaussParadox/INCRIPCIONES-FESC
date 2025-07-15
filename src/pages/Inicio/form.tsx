@@ -2,43 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
+import type { Formulario } from '@/models/Formulario';
+import {formularioService} from '@/services/formularioService';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
+import Swal from 'sweetalert2';
 import 'primereact/resources/themes/saga-green/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
-interface FormData {
-    formv_nombre_prog_formacion: string;
-    formv_nombres: string;
-    formv_apellidos: string;
-    formd_fecha: string;
-    formv_tipo_identificacion: string;
-    formv_identificacion: string;
-    formv_expedicion: string;
-    formv_direccion: string;
-    formv_telefono_fijo: string;
-    formv_correo_postulante: string;
-    formv_celular: string;
-    formv_empresa_laboral: string;
-    formv_cargo: string;
-    formv_direccion_oficina: string;
-    formv_telefono_oficina: string;
-    formv_correo_oficina: string;
-    formv_nivel_academico: string;
-    formv_universidad: string;
-    formv_nombre_prog_academico: string;
-    formv_year: number;
-    formv_egresado: boolean;
-    formv_forma_pago: string;
-}
 
 const Form: React.FC = () => {
     const [visible, setVisible] = useState(false);
     const [fechaFinalizacion, setFechaFinalizacion] = useState<Date | null>(null);
     const [egresadoFESC, setEgresadoFESC] = useState<boolean | null>(null);
     const [aceptaTerminos, setAceptaTerminos] = useState<boolean>(false);
-    
-    const [formData, setFormData] = useState<FormData>({
-        formd_fecha: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }),
+    const [Programa, setProgramas] = useState<{ id: number; programa: string }[]>([]);
+
+    const [Formulario, setFormulario] = useState<Formulario>({
+        
+        formd_fecha: new Date().toISOString().split('T')[0],
         formv_nombre_prog_formacion: '',
         formv_nombres: '',
         formv_apellidos: '',
@@ -58,12 +41,14 @@ const Form: React.FC = () => {
         formv_universidad: '',
         formv_nombre_prog_academico: '',
         formv_year: 0,
-        formv_egresado: false,
+        formv_egresado: undefined,
         formv_forma_pago: ''
     });
 
-    const handleInputChange = (field: keyof FormData, value: string | boolean | number) => {
-        setFormData(prev => ({
+     const toast = useRef<Toast>(null);
+
+    const handleInputChange = (field: keyof Formulario, value: string | boolean | number) => {
+        setFormulario(prev => ({
             ...prev,
             [field]: value
         }));
@@ -73,26 +58,80 @@ const Form: React.FC = () => {
         console.log('Navegando al inicio...');
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Generar JSON
-        const jsonResult = JSON.stringify(formData, null, 2);
-        console.log('Datos del formulario en JSON:', jsonResult);
+   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
 
+    if (!aceptaTerminos) {
+        toast.current?.show({
+            severity: 'warn',
+            summary: 'Términos requeridos',
+            detail: 'Debes aceptar los términos y condiciones para continuar.',
+            life: 4000
+        });
+        return;
+    }
+
+    // Convertir fecha a año y egresado booleano a "SI"/"NO"
+    const yearFromFechaFinalizacion = fechaFinalizacion ? new Date(fechaFinalizacion).getFullYear() : undefined;
+    const egresado = egresadoFESC === null ? undefined : egresadoFESC ? 'SI' : 'NO';
+
+    const dataAEnviar: Formulario = {
+        ...Formulario,
+        formv_year: yearFromFechaFinalizacion,
+        formv_egresado: egresado,
     };
 
+    try {
+    const response = await formularioService.postGuardarFormulario(dataAEnviar);
+
+    Swal.fire({
+        title: '¡Inscripción enviada con éxito!',
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        backdrop: true,
+        allowOutsideClick: false,
+    }).then(() => {
+        window.location.href = 'https://www.fesc.edu.co/portal/component/weblinks/weblink/101-google?catid=87&Itemid=640';
+    });
+
+    console.log('Formulario guardado. ID:', response.id);
+} catch (error) {
+    toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo enviar el formulario. Inténtalo de nuevo.',
+        life: 5000
+    });
+    console.error('Error al enviar el formulario:', error);
+}
+};
+
     useEffect(() => {
-        if (visible) {
-            document.body.classList.add('overflow-hidden');
-        } else {
-            document.body.classList.remove('overflow-hidden');
+
+    if (visible) {
+        document.body.classList.add('overflow-hidden');
+    } else {
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Función para cargar programas desde el backend
+    const fetchProgramas = async () => {
+        try {
+            const response = await formularioService.getProgramas(); 
+            setProgramas(response);
+        } catch (error) {
+            console.error('Error al cargar programas:', error);
         }
-        return () => {
-            document.body.classList.remove('overflow-hidden');
-        };
-    }, [visible]);
+    };
+
+    fetchProgramas(); 
+
+    return () => {
+        document.body.classList.remove('overflow-hidden');
+    };
+}, [visible]);
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50 to-indigo-100 flex items-center justify-center p-4 relative">
@@ -110,23 +149,29 @@ const Form: React.FC = () => {
                 <div className="flex items-center justify-end px-8 py-4 bg-gray-100">
                     <span className="text-sm text-gray-600 font-medium mr-2">Fecha de diligenciamiento:</span>
                     <span className="text-sm text-gray-800 font-semibold">
-                        {formData.formd_fecha}
+                        {Formulario.formd_fecha}
                     </span>
                 </div>
 
                 {/* Nombre del Programa de Formación Continua */}
-                <div className="px-8 py-4 bg-gray-100 flex items-center">
-                    <label className="block text-sm font-medium text-gray-700 mr-4">
-                        NOMBRE DEL PROGRAMA DE FORMACIÓN CONTINUA:
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.formv_nombre_prog_formacion}
-                        onChange={(e) => handleInputChange('formv_nombre_prog_formacion', e.target.value)}
-                        className="w-full max-w-md px-4 py-2 border border-grey-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                        placeholder="Ingrese el nombre del programa"
-                    />
-                </div>
+               <div className="px-8 py-4 bg-gray-100 flex items-center">
+                <label className="block text-sm font-medium text-gray-700 mr-4">
+                    NOMBRE DEL PROGRAMA DE FORMACIÓN CONTINUA:
+                </label>
+                <select
+                    value={Formulario.formv_nombre_prog_formacion}
+                    onChange={(e) => handleInputChange('formv_nombre_prog_formacion', e.target.value)}
+                    className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                >
+                    <option value="">Seleccione un programa</option>
+                    {Programa.map((programa) => (
+                        <option key={programa.id} value={programa.programa}>
+                            {programa.programa}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
 
                 {/* Form Content */}
                 <form onSubmit={handleSubmit}>
@@ -143,7 +188,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Nombres</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_nombres}
+                                            value={Formulario.formv_nombres}
                                             onChange={(e) => handleInputChange('formv_nombres', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Nombres"
@@ -153,7 +198,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Apellidos</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_apellidos}
+                                            value={Formulario.formv_apellidos}
                                             onChange={(e) => handleInputChange('formv_apellidos', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Apellidos"
@@ -163,7 +208,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico Personal</label>
                                         <input
                                             type="email"
-                                            value={formData.formv_correo_postulante}
+                                            value={Formulario.formv_correo_postulante}
                                             onChange={(e) => handleInputChange('formv_correo_postulante', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Correo@gmail.com"
@@ -173,7 +218,7 @@ const Form: React.FC = () => {
                                         <div className="w-1/2">
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Documento</label>
                                             <select
-                                                value={formData.formv_tipo_identificacion}
+                                                value={Formulario.formv_tipo_identificacion}
                                                 onChange={(e) => handleInputChange('formv_tipo_identificacion', e.target.value)}
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             >
@@ -188,7 +233,7 @@ const Form: React.FC = () => {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Número de Identificación</label>
                                             <input
                                                 type="text"
-                                                value={formData.formv_identificacion}
+                                                value={Formulario.formv_identificacion}
                                                 onChange={(e) => handleInputChange('formv_identificacion', e.target.value)}
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                                 placeholder="Número de Identificación"
@@ -199,7 +244,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Expedición</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_expedicion}
+                                            value={Formulario.formv_expedicion}
                                             onChange={(e) => handleInputChange('formv_expedicion', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Lugar de expedición"
@@ -209,7 +254,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Dirección Residencial</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_direccion}
+                                            value={Formulario.formv_direccion}
                                             onChange={(e) => handleInputChange('formv_direccion', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Dirección Residencial"
@@ -219,7 +264,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Fijo</label>
                                         <input
                                             type="tel"
-                                            value={formData.formv_telefono_fijo}
+                                            value={Formulario.formv_telefono_fijo}
                                             onChange={(e) => handleInputChange('formv_telefono_fijo', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Teléfono Fijo"
@@ -229,7 +274,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Celular</label>
                                         <input
                                             type="tel"
-                                            value={formData.formv_celular}
+                                            value={Formulario.formv_celular}
                                             onChange={(e) => handleInputChange('formv_celular', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Teléfono Celular"
@@ -249,7 +294,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Empresa que Labora</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_empresa_laboral}
+                                            value={Formulario.formv_empresa_laboral}
                                             onChange={(e) => handleInputChange('formv_empresa_laboral', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 hover:border-yellow-400"
                                             placeholder="Empresa que Labora"
@@ -259,7 +304,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Cargo que desempeña</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_cargo}
+                                            value={Formulario.formv_cargo}
                                             onChange={(e) => handleInputChange('formv_cargo', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 hover:border-yellow-400"
                                             placeholder="Cargo que desempeña"
@@ -269,7 +314,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Dirección Oficina</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_direccion_oficina}
+                                            value={Formulario.formv_direccion_oficina}
                                             onChange={(e) => handleInputChange('formv_direccion_oficina', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 hover:border-yellow-400"
                                             placeholder="Dirección Oficina"
@@ -279,7 +324,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Oficina</label>
                                         <input
                                             type="tel"
-                                            value={formData.formv_telefono_oficina}
+                                            value={Formulario.formv_telefono_oficina}
                                             onChange={(e) => handleInputChange('formv_telefono_oficina', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 hover:border-yellow-400"
                                             placeholder="Teléfono Oficina"
@@ -289,7 +334,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico de Empresa</label>
                                         <input
                                             type="email"
-                                            value={formData.formv_correo_oficina}
+                                            value={Formulario.formv_correo_oficina}
                                             onChange={(e) => handleInputChange('formv_correo_oficina', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 hover:border-yellow-400"
                                             placeholder="Correo Electrónico de Empresa"
@@ -308,7 +353,7 @@ const Form: React.FC = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Último nivel de estudios</label>
                                         <select
-                                            value={formData.formv_nivel_academico}
+                                            value={Formulario.formv_nivel_academico}
                                             onChange={(e) => handleInputChange('formv_nivel_academico', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-green-400"
                                         >
@@ -323,7 +368,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Universidad</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_universidad}
+                                            value={Formulario.formv_universidad}
                                             onChange={(e) => handleInputChange('formv_universidad', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-green-400"
                                             placeholder="Universidad"
@@ -333,7 +378,7 @@ const Form: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Nombre del programa académico</label>
                                         <input
                                             type="text"
-                                            value={formData.formv_nombre_prog_academico}
+                                            value={Formulario.formv_nombre_prog_academico}
                                             onChange={(e) => handleInputChange('formv_nombre_prog_academico', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-green-400"
                                             placeholder="Programa académico"
@@ -400,7 +445,7 @@ const Form: React.FC = () => {
                                                 type="radio"
                                                 name="metodo_pago"
                                                 value={option.value}
-                                                checked={formData.formv_forma_pago === option.value}
+                                                checked={Formulario.formv_forma_pago === option.value}
                                                 onChange={(e) => handleInputChange('formv_forma_pago', e.target.value)}
                                                 className="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500"
                                             />
