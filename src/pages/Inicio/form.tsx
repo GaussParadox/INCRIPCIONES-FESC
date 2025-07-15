@@ -209,9 +209,22 @@ const Form: React.FC = () => {
                                         <input
                                             type="email"
                                             value={Formulario.formv_correo_postulante}
-                                            onChange={(e) => handleInputChange('formv_correo_postulante', e.target.value)}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Solo permitir un correo (sin comas ni espacios)
+                                                if (value.includes(',') || value.includes(' ')) {
+                                                    toast.current?.show({
+                                                        severity: 'warn',
+                                                        summary: 'Correo inválido',
+                                                        detail: 'Solo se permite una dirección de correo electrónico.',
+                                                        life: 4000
+                                                    });
+                                                    return;
+                                                }
+                                                handleInputChange('formv_correo_postulante', value);
+                                            }}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
-                                            placeholder="Correo@gmail.com"
+                                            placeholder="Correo Electrónico Personal"
                                         />
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -234,7 +247,14 @@ const Form: React.FC = () => {
                                             <input
                                                 type="text"
                                                 value={Formulario.formv_identificacion}
-                                                onChange={(e) => handleInputChange('formv_identificacion', e.target.value)}
+                                                onChange={(e) => {
+                                                    // Solo permitir números y máximo 10 dígitos
+                                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                    handleInputChange('formv_identificacion', value);
+                                                }}
+                                                maxLength={10}
+                                                inputMode="numeric"
+                                                pattern="\d*"
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                                 placeholder="Número de Identificación"
                                             />
@@ -261,21 +281,35 @@ const Form: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Fijo</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Fijo <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="tel"
                                             value={Formulario.formv_telefono_fijo}
-                                            onChange={(e) => handleInputChange('formv_telefono_fijo', e.target.value)}
+                                            onChange={(e) => {
+                                                // Permitir solo números y máximo 10 dígitos
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                handleInputChange('formv_telefono_fijo', value);
+                                            }}
+                                            maxLength={10}
+                                            inputMode="numeric"
+                                            pattern="\d*"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Teléfono Fijo"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Celular</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Celular <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="tel"
                                             value={Formulario.formv_celular}
-                                            onChange={(e) => handleInputChange('formv_celular', e.target.value)}
+                                            onChange={(e) => {
+                                                // Permitir solo números y máximo 10 dígitos
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                handleInputChange('formv_celular', value);
+                                            }}
+                                            maxLength={10}
+                                            inputMode="numeric"
+                                            pattern="\d*"
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-grey-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                                             placeholder="Teléfono Celular"
                                         />
@@ -283,15 +317,15 @@ const Form: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Información Laboral */}
+                            {/* Información Laboral (Opcional) */}
                             <div className="bg-red-50 rounded-xl p-6">
                                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                                     <div className="w-6 h-6 bg-yellow-500 rounded-full mr-3"></div>
-                                    Información Laboral
+                                    Información Laboral <span className="ml-2 text-xs text-gray-500 font-normal">(Opcional)</span>
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Empresa que Labora</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Empresa que Labora <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="text"
                                             value={Formulario.formv_empresa_laboral}
@@ -301,7 +335,7 @@ const Form: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Cargo que desempeña</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Cargo que desempeña <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="text"
                                             value={Formulario.formv_cargo}
@@ -311,7 +345,7 @@ const Form: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Dirección Oficina</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Dirección Oficina <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="text"
                                             value={Formulario.formv_direccion_oficina}
@@ -321,7 +355,7 @@ const Form: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Oficina</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Oficina <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="tel"
                                             value={Formulario.formv_telefono_oficina}
@@ -331,7 +365,7 @@ const Form: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico de Empresa</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico de Empresa <span className="text-xs text-gray-400">(Opcional)</span></label>
                                         <input
                                             type="email"
                                             value={Formulario.formv_correo_oficina}
@@ -365,13 +399,13 @@ const Form: React.FC = () => {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Universidad</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Institución</label>
                                         <input
                                             type="text"
                                             value={Formulario.formv_universidad}
                                             onChange={(e) => handleInputChange('formv_universidad', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-green-400"
-                                            placeholder="Universidad"
+                                            placeholder="Institución"
                                         />
                                     </div>
                                     <div>
