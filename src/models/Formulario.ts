@@ -23,3 +23,9 @@ export interface Formulario {
   formv_egresado?: 'SI' | 'NO';
   formv_forma_pago?: string;
 }
+
+export interface Programa {
+  id: number;
+  programa: string;
+}
+

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { Formulario } from '../models/Formulario';
+import type { Formulario, Programa } from '../models/Formulario';
 
-const apiBaseURL = 'http://localhost:3000/api'; 
+const apiBaseURL = 'http://localhost:3000/api/form';
 
 export const formularioService = {
 
@@ -19,5 +19,12 @@ export const formularioService = {
   getFormularioById: async (id: number): Promise<Formulario> => {
   const response = await axios.get(`${apiBaseURL}/formulario/${id}`);
   return response.data as Formulario;
-}
+},
+
+  getProgramas: async (): Promise<Programa[]> => {
+    const response = await axios.get(`${apiBaseURL}/programas`);
+    return response.data as Programa[];
+  },
+
+
 };
