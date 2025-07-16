@@ -49,6 +49,7 @@ export interface TotalInscritos {
 export interface ConteoPorPrograma {
   programa: string;
   total: number;
+  
 }
 
 
