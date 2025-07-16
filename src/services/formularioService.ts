@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Formulario, Programa } from '../models/Formulario';
+import type { Formulario, Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos  } from '../models/Formulario';
 
 const apiBaseURL = 'http://localhost:3000/api/form';
 
@@ -24,7 +24,23 @@ export const formularioService = {
   getProgramas: async (): Promise<Programa[]> => {
     const response = await axios.get(`${apiBaseURL}/programas`);
     return response.data as Programa[];
-  },
+},
+
+  getFormulariosResumen: async (): Promise<ProgramaResumen[]> => {
+    const response = await axios.get(`${apiBaseURL}/formularios/resumen`);
+    return response.data as ProgramaResumen[];
+},
+
+  getTotalInscritos: async (): Promise<TotalInscritos> => {
+  const response = await axios.get(`${apiBaseURL}/totalinscritos`);
+  return response.data as TotalInscritos;
+},
+
+  getConteoPorPrograma: async (): Promise<ConteoPorPrograma[]> => {
+  const response = await axios.get(`${apiBaseURL}/totalesporprograma`);
+  return response.data as ConteoPorPrograma[];
+},
+
 
 
 };

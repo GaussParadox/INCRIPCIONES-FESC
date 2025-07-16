@@ -4,9 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { UserPlusIcon, UsersIcon, UserXIcon, WalletIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { formularioService } from "@/services/formularioService";
+import type { TotalInscritos } from "@/models/Formulario";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [totalInscritos, setTotalInscritos] = useState<number>(0);
+
+useEffect(() => {
+  const fetchTotal = async () => {
+    try {
+      const data: TotalInscritos = await formularioService.getTotalInscritos();
+      setTotalInscritos(data.total);
+    } catch (error) {
+      console.error("Error al obtener el total de inscritos:", error);
+    }
+  };
+
+  fetchTotal();
+}, []);
+
   return (
     <div className="flex flex-col p-4 gap-4">
       <div>
@@ -35,20 +53,20 @@ const Dashboard = () => {
 
         <TabsContent value="daily" className="space-y-4">
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  New Users Today
-                </CardTitle>
-                <UserPlusIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">24</div>
-                <p className="text-xs text-muted-foreground">
-                  +12% from yesterday
-                </p>
-              </CardContent>
-            </Card>
+           <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total de Inscritos
+            </CardTitle>
+            <UserPlusIcon className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalInscritos}</div>
+            <p className="text-xs text-muted-foreground">
+              Actualizado en tiempo real
+            </p>
+          </CardContent>
+        </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

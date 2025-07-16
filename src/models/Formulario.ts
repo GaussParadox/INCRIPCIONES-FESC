@@ -29,3 +29,29 @@ export interface Programa {
   programa: string;
 }
 
+export interface ProgramaResumen {
+  formn_id: number;
+  formv_nombre_prog_formacion: string;
+  formv_nombres: string;
+  formv_apellidos: string;
+  formd_fecha: string;
+  formv_identificacion: string;
+  formv_correo_postulante: string;
+  formv_celular: string;
+  formv_forma_pago: string;
+  fecha_formateada: string;
+}
+
+export interface TotalInscritos {
+  total: number;
+}
+
+export interface ConteoPorPrograma {
+  programa: string;
+  total: number;
+}
+
+
+
+
+

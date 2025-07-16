@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import type { Formulario } from '@/models/Formulario';
-import {formularioService} from '@/services/formularioService';
+import { formularioService } from '@/services/formularioService';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import Swal from 'sweetalert2';
