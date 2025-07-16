@@ -52,6 +52,16 @@ export interface ConteoPorPrograma {
   
 }
 
+export interface TotalProgramas {
+  total: number;
+}
+
+export interface ProgramaMasInscritos {
+  programa: string;
+  total_inscritos: number;
+}
+
+
 
 
 

@@ -28,7 +28,7 @@ const pathname = location.pathname
         )}
       >
         <div className="flex h-14 items-center border-b px-4">
-          <span className="text-lg font-semibold">Sambo Admin</span>
+          <span className="text-lg font-semibold">Inscripciones cursos FESC</span>
           <Button variant="ghost" size="icon" className="ml-auto lg:hidden" onClick={toggle}>
             <Menu className="h-5 w-5" />
           </Button>
@@ -117,7 +117,7 @@ const pathname = location.pathname
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Users", href: "/users", icon: Users, badge: "8" },
+  { name: "Inscritos", href: "/users", icon: Users, badge: "8" },
   { name: "Transactions", href: "/transactions", icon: Wallet },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ]

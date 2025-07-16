@@ -1,29 +1,49 @@
 import { DashboardChart } from "@/components/dashboard-chart";
-import { RecentTransactions } from "@/components/recent-transactions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { UserPlusIcon, UsersIcon, UserXIcon, WalletIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formularioService } from "@/services/formularioService";
-import type { TotalInscritos } from "@/models/Formulario";
+import type { TotalInscritos, ConteoPorPrograma, } from "@/models/Formulario";
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [totalInscritos, setTotalInscritos] = useState<number>(0);
+  const [totalProgramas, setTotalProgramas] = useState<number>(0);
+  const [conteoPorPrograma, setConteoPorPrograma] = useState<ConteoPorPrograma[]>([]);
+  const [programaMasInscritos, setProgramaMasInscritos] = useState<{ programa: string; total_inscritos: number } | null>(null);
+
+
 
 useEffect(() => {
-  const fetchTotal = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const data: TotalInscritos = await formularioService.getTotalInscritos();
-      setTotalInscritos(data.total);
+      const totalData: TotalInscritos = await formularioService.getTotalInscritos();
+      setTotalInscritos(totalData.total);
+
+      const conteoData = await formularioService.getConteoPorPrograma();
+      const parsed = conteoData.map(item => ({
+        programa: item.programa,
+        total: parseInt(item.total as any, 10)
+      }));
+      setConteoPorPrograma(parsed);
+
+      const totalProgramasData = await formularioService.getTotalProgramas();
+      setTotalProgramas(totalProgramasData.total);
+
+      const programaMasInscritosData = await formularioService.getProgramaConMasInscritos();
+      setProgramaMasInscritos(programaMasInscritosData);
+
     } catch (error) {
-      console.error("Error al obtener el total de inscritos:", error);
+      console.error("Error al obtener datos del dashboard:", error);
     }
   };
 
-  fetchTotal();
+  fetchDashboardData();
 }, []);
+
 
   return (
     <div className="flex flex-col p-4 gap-4">
@@ -69,34 +89,38 @@ useEffect(() => {
         </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Users
-                </CardTitle>
-                <UsersIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,284</div>
-                <p className="text-xs text-muted-foreground">
-                  +2.5% from last week
-                </p>
-              </CardContent>
-            </Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total de Programas
+              </CardTitle>
+              <UsersIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalProgramas}</div>
+              <p className="text-xs text-muted-foreground">
+                Programas disponibles actualmente
+              </p>
+            </CardContent>
+          </Card>
+
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Transactions Today
-                </CardTitle>
-                <WalletIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">R 12,543</div>
-                <p className="text-xs text-muted-foreground">
-                  +18% from yesterday
-                </p>
-              </CardContent>
-            </Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Programa más inscrito
+              </CardTitle>
+              <WalletIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-base font-bold">
+                {programaMasInscritos ? programaMasInscritos.programa : "Cargando..."}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total de inscritos: {programaMasInscritos?.total_inscritos ?? "--"}
+              </p>
+            </CardContent>
+          </Card>
+
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -239,27 +263,16 @@ useEffect(() => {
       </Tabs>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-10">
           <CardHeader>
-            <CardTitle>Transaction Overview</CardTitle>
-            <CardDescription>Transaction volume over time</CardDescription>
+            <CardTitle>Total inscritos por curso</CardTitle>
+            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <DashboardChart />
+            <DashboardChart data={conteoPorPrograma} />
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>
-              Latest transactions on the platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions />
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
