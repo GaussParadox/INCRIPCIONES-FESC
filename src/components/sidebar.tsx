@@ -47,11 +47,6 @@ const pathname = location.pathname
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.name}</span>
-                  {item.badge && (
-                    <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[0.625rem] font-medium text-primary-foreground">
-                      {item.badge}
-                    </span>
-                  )}
                 </a>
               ))}
             </nav>
@@ -117,8 +112,8 @@ const pathname = location.pathname
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Inscritos", href: "/users", icon: Users, badge: "8" },
-  { name: "Transactions", href: "/transactions", icon: Wallet },
+  { name: "Inscritos", href: "/users", icon: Users,  },
+  { name: "Programas", href: "/programas", icon: Wallet },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
 ]
 

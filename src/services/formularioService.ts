@@ -26,6 +26,17 @@ export const formularioService = {
     return response.data as Programa[];
 },
 
+postCrearPrograma: async (programa: string): Promise<{ message: string }> => {
+  const response = await axios.post<{ message: string }>(`${apiBaseURL}/programas`, { programa });
+  return response.data;
+},
+
+  deletePrograma: async (id: number): Promise<{ message: string }> => {
+  const response = await axios.delete<{ message: string }>(`${apiBaseURL}/programas/${id}`);
+  return response.data;
+},
+
+
   getFormulariosResumen: async (): Promise<ProgramaResumen[]> => {
     const response = await axios.get(`${apiBaseURL}/formularios/resumen`);
     return response.data as ProgramaResumen[];

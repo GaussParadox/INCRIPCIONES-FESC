@@ -4,39 +4,43 @@ import { formularioService } from "@/services/formularioService";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/components/ui/table";
 import { Search, UserCog } from "lucide-react";
-import { CreateUserDialog } from "@/components/create-user-dialog";
+import { CrearCursos} from "@/components/create-user-dialog";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 
 export default function UsersPage() {
   const [formularios, setFormularios] = useState<ProgramaResumen[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPrograma, setSelectedPrograma] = useState("");
+  const [programas, setProgramas] = useState<string[]>([]);
+
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await formularioService.getFormulariosResumen();
-        setFormularios(data);
-      } catch (error) {
-        console.error("Error al cargar formularios:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      // Cargar todos los formularios
+      const data = await formularioService.getFormulariosResumen();
+      setFormularios(data);
 
-    fetchData();
-  }, []);
+      // Extraer programas únicos desde los formularios ya cargados
+      const programasUnicos = Array.from(
+        new Set(data.map((form) => form.formv_nombre_prog_formacion))
+      );
+      setProgramas(programasUnicos);
+    } catch (error) {
+      console.error("Error al cargar formularios o programas:", error);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   const filteredFormularios = formularios.filter((form) => {
-    const query = searchTerm.toLowerCase();
-    return (
+  const query = searchTerm.toLowerCase();
+  const matchBusqueda = (
     form.formv_nombres?.toLowerCase().includes(query) ||
     form.formv_apellidos?.toLowerCase().includes(query) ||
     form.formv_correo_postulante?.toLowerCase().includes(query) ||
@@ -45,8 +49,13 @@ export default function UsersPage() {
     form.formv_nombre_prog_formacion?.toLowerCase().includes(query) ||
     form.formv_forma_pago?.toLowerCase().includes(query) ||
     form.fecha_formateada?.toLowerCase().includes(query)
-    );
-  });
+  );
+
+  const matchPrograma = selectedPrograma === "" || form.formv_nombre_prog_formacion === selectedPrograma;
+
+  return matchBusqueda && matchPrograma;
+});
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +73,6 @@ export default function UsersPage() {
                 Consulta rápida de inscripciones
               </p>
             </div>
-            <CreateUserDialog />
           </div>
 
           <Card>
@@ -79,6 +87,19 @@ export default function UsersPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
+
+                <select
+                className="h-9 border border-gray-300 rounded px-2 text-sm"
+                value={selectedPrograma}
+                onChange={(e) => setSelectedPrograma(e.target.value)}
+                >
+                <option value="">Filtrar por curso</option>
+                {programas.map((prog, idx) => (
+                  <option key={idx} value={prog}>
+                    {prog}
+                  </option>
+                ))}
+              </select>
                 <div className="flex items-center gap-2 ml-auto">
                   <Button variant="outline" size="sm">
                     Exportar
