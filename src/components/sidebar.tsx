@@ -27,8 +27,11 @@ const pathname = location.pathname
           "lg:translate-x-0",
         )}
       >
-        <div className="flex h-14 items-center border-b px-4">
+        <div className="flex h-18 items-center border-b px-4">
+          <div className="flex items-center justify-center gap-3">
           <span className="text-lg font-semibold">Inscripciones cursos FESC</span>
+          <img src="/fescoficial.png" alt="FESC Logo" className="h-15 object-contain" />
+        </div>
           <Button variant="ghost" size="icon" className="ml-auto lg:hidden" onClick={toggle}>
             <Menu className="h-5 w-5" />
           </Button>

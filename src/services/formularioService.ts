@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Formulario, Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos, TotalProgramas, ProgramaMasInscritos  } from '../models/Formulario';
+import type { Formulario, Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos, TotalProgramas, ProgramaMasInscritos, Fuente, PreForm  } from '../models/Formulario';
 
 const apiBaseURL = 'http://localhost:3000/api/form';
 
@@ -21,9 +21,42 @@ export const formularioService = {
   return response.data as Formulario;
 },
 
-  getProgramas: async (): Promise<Programa[]> => {
+descargarExcel: async (): Promise<void> => {
+  const response = await axios.get<Blob>(`${apiBaseURL}/formularios/excel`, {
+    responseType: 'blob',
+  });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'Inscritos cursos FESC 2025.xlsx'); 
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+},
+
+descargarPDF: async (id: number): Promise<void> => {
+  const response = await axios.get(`${apiBaseURL}/formulario/pdf/${id}`, {
+    responseType: 'blob',
+  });
+
+  const blob = response.data as Blob;  
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `Formulario_${id}.pdf`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+},
+
+ getProgramas: async (): Promise<Programa[]> => {
     const response = await axios.get(`${apiBaseURL}/programas`);
     return response.data as Programa[];
+},
+
+  getFuentes: async (): Promise<Fuente[]> => {
+    const response = await axios.get(`${apiBaseURL}/fuentes`);
+    return response.data as Fuente[];
 },
 
 postCrearPrograma: async (programa: string): Promise<{ message: string }> => {
@@ -62,7 +95,9 @@ getProgramaConMasInscritos: async (): Promise<ProgramaMasInscritos> => {
   return response.data;
 },
 
-
-
+postGuardarPreinscripcion: async (preForm: PreForm): Promise<{ message: string }> => {
+  const response = await axios.post<{ message: string }>(`${apiBaseURL}/formulario/preinscripcion`, preForm);
+  return response.data;
+},
 
 };

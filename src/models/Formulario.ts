@@ -24,6 +24,19 @@ export interface Formulario {
   formv_forma_pago?: string;
 }
 
+export interface PreForm {
+  preformv_nombres: string;
+  preformv_apellidos: string;
+  preformv_correo: string;
+  preformv_fuentes: string;
+}
+
+
+export interface Fuente {
+  id: number;
+  fuente: string;
+}
+
 export interface Programa {
   id: number;
   programa: string;
