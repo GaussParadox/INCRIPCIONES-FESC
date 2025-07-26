@@ -22,6 +22,9 @@ export interface Formulario {
   formv_year?: number;
   formv_egresado?: 'SI' | 'NO';
   formv_forma_pago?: string;
+  formv_firma_base64?: string;
+  formv_documento_base64?: string;
+  formv_comprobante_pago_base64?: string;
 }
 
 export interface PreForm {
@@ -62,7 +65,10 @@ export interface TotalInscritos {
 export interface ConteoPorPrograma {
   programa: string;
   total: number;
-  
+}
+export interface ConteoPorfuente {
+  fuente: string;
+  total: number;
 }
 
 export interface TotalProgramas {
@@ -74,8 +80,13 @@ export interface ProgramaMasInscritos {
   total_inscritos: number;
 }
 
+export interface FuenteMasInscritos {
+  fuente: string;
+  total_inscritos: number;
+}
 
-
-
-
-
+export interface UsuariosAdministradores {
+  id: number;
+  email: string;
+  password: string;
+}

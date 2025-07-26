@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Formulario, Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos, TotalProgramas, ProgramaMasInscritos, Fuente, PreForm  } from '../models/Formulario';
+import type { Formulario, ConteoPorfuente ,Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos, TotalProgramas, ProgramaMasInscritos, Fuente, PreForm, FuenteMasInscritos  } from '../models/Formulario';
 
 const apiBaseURL = 'http://localhost:3000/api/form';
 
@@ -85,6 +85,11 @@ postCrearPrograma: async (programa: string): Promise<{ message: string }> => {
   return response.data as ConteoPorPrograma[];
 },
 
+getConteoPorFuente: async (): Promise<ConteoPorfuente[]> => {
+  const response = await axios.get(`${apiBaseURL}/totalesporfuente`);
+  return response.data as ConteoPorfuente[];
+},
+
   getTotalProgramas: async (): Promise<TotalProgramas> => {
   const response = await axios.get<TotalProgramas>(`${apiBaseURL}/totalprogramas`);
   return response.data;
@@ -95,9 +100,18 @@ getProgramaConMasInscritos: async (): Promise<ProgramaMasInscritos> => {
   return response.data;
 },
 
+getFuenteConMasInscritos: async (): Promise<FuenteMasInscritos> => {
+  const response = await axios.get<FuenteMasInscritos>(`${apiBaseURL}/fuente-mas-inscritos`);
+  return response.data;
+},
+
 postGuardarPreinscripcion: async (preForm: PreForm): Promise<{ message: string }> => {
   const response = await axios.post<{ message: string }>(`${apiBaseURL}/formulario/preinscripcion`, preForm);
   return response.data;
 },
+
+
+
+
 
 };

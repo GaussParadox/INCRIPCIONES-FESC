@@ -1,12 +1,13 @@
 import { DashboardChart } from "@/components/dashboard-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@radix-ui/react-tabs";
-import { UserPlusIcon, UsersIcon, UserXIcon, WalletIcon } from "lucide-react";
+import {  CheckLineIcon, ComputerIcon, NotebookPen, UserPlusIcon, UsersIcon, UserXIcon, WalletIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { formularioService } from "@/services/formularioService";
 import type { TotalInscritos, ConteoPorPrograma, } from "@/models/Formulario";
 import { SyncLoader, PropagateLoader } from "react-spinners";
+import type { FuenteMasInscritos } from "@/models/Formulario";
 
 
 const Dashboard = () => {
@@ -15,6 +16,8 @@ const Dashboard = () => {
   const [loadingProgramas, setLoadingProgramas] = useState(true);
   const [loadingConteoPorPrograma, setLoadingConteoPorPrograma] = useState(true);
   const [loadingProgramaMasInscritos, setLoadingProgramaMasInscritos] = useState(true);
+  const [loadingFuenteMasInscritos, setLoadingFuenteMasInscritos] = useState(true);
+  const [fuenteMasInscritos, setFuenteMasInscritos] = useState<FuenteMasInscritos | null>(null);
   const [totalInscritos, setTotalInscritos] = useState<number>(0);
   const [totalProgramas, setTotalProgramas] = useState<number>(0);
   const [conteoPorPrograma, setConteoPorPrograma] = useState<ConteoPorPrograma[]>([]);
@@ -45,6 +48,10 @@ useEffect(() => {
       setProgramaMasInscritos(programaMasInscritosData);
       setLoadingProgramaMasInscritos(false);
 
+      const fuenteMasInscritosData = await formularioService.getFuenteConMasInscritos();
+      setFuenteMasInscritos(fuenteMasInscritosData);
+      setLoadingFuenteMasInscritos(false);
+
     } catch (error) {
       console.error("Error al obtener datos del dashboard:", error);
       setLoadingInscritos(false);
@@ -67,19 +74,20 @@ useEffect(() => {
         <p className="text-muted-foreground">
           Resumen de inscripciones y cursos disponibles
         </p>
-        <button
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={() => navigate("/form")}
-        >
-          Ir al Formulario
-        </button>
-
-        <button
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={() => navigate("/preform")}
-        >
-          Ir al Formulario
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <button
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200 shadow"
+        onClick={() => navigate("/form")}
+          >
+        Ir al Formulario
+          </button>
+          <button
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200 shadow"
+        onClick={() => navigate("/preform")}
+          >
+        Ir al pre Formulario
+          </button>
+        </div>
       </div>
 
       <Tabs defaultValue="daily" className="space-y-4">
@@ -106,8 +114,8 @@ useEffect(() => {
 
 <Card>
   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium">Total de Programas</CardTitle>
-    <UsersIcon className="h-4 w-4 text-muted-foreground" />
+    <CardTitle className="text-sm font-medium">Total de Cursos y Diplomados</CardTitle>
+    <ComputerIcon className="h-4 w-4 text-muted-foreground" />
   </CardHeader>
   <CardContent>
     {loadingProgramas ? (
@@ -115,7 +123,7 @@ useEffect(() => {
     ) : (
       <>
         <div className="text-2xl font-bold">{totalProgramas}</div>
-        <p className="text-xs text-muted-foreground">Programas disponibles actualmente</p>
+        <p className="text-xs text-muted-foreground">Cursos y Diplomados disponibles actualmente</p>
       </>
     )}
   </CardContent>
@@ -123,8 +131,8 @@ useEffect(() => {
 
 <Card>
   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium">Programa más inscrito</CardTitle>
-    <WalletIcon className="h-4 w-4 text-muted-foreground" />
+    <CardTitle className="text-sm font-medium">Programa con más inscritos</CardTitle>
+    <NotebookPen className="h-4 w-4 text-muted-foreground" />
   </CardHeader>
   <CardContent>
     {loadingProgramaMasInscritos ? (
@@ -144,18 +152,26 @@ useEffect(() => {
 
 
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Non-Users</CardTitle>
-                <UserXIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">342</div>
-                <p className="text-xs text-muted-foreground">
-                  -4% from yesterday
-                </p>
-              </CardContent>
-            </Card>
+           <Card>
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <CardTitle className="text-sm font-medium">Mejor fuente de publicidad</CardTitle>
+    <CheckLineIcon className="h-4 w-4 text-muted-foreground" />
+  </CardHeader>
+  <CardContent>
+    {loadingFuenteMasInscritos ? (
+      <SyncLoader color="#e10a0a" size={8} />
+    ) : (
+      <>
+        <div className="text-base font-bold">
+          {fuenteMasInscritos ? fuenteMasInscritos.fuente : "No disponible"}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Total de inscritos: {fuenteMasInscritos?.total_inscritos ?? "--"}
+        </p>
+      </>
+    )}
+  </CardContent>
+</Card>
           </div>
         </TabsContent>
 

@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 
 
 export default function Preform() {
+  const [camposObligatorios, setCamposObligatorios] = useState<string[]>([]);
   const [formData, setFormData] = useState<PreForm>({
     preformv_nombres: '',
     preformv_apellidos: '',
@@ -47,17 +48,66 @@ useEffect(() => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-red-100 to-red-200 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 via-red-500/10 to-red-400/10"></div>
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+      {/* Fondo base con gradiente más claro */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-100 via-red-50 to-white"></div>
 
-      <Card className="w-full max-w-lg backdrop-blur-sm bg-white/80 border-0 shadow-2xl relative overflow-hidden">
+      {/* Capa de patrones geométricos más suaves */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-red-100/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-red-200/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-10 w-48 h-48 bg-red-200/10 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      {/* Efectos de luz más claros */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-red-100/30 to-transparent"></div>
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-red-200/20 to-transparent"></div>
+      </div>
+
+      {/* Partículas flotantes más tenues */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/6 w-2 h-2 bg-red-100/60 rounded-full animate-bounce" style={{animationDuration: '3s', animationDelay: '0s'}}></div>
+        <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-red-50/80 rounded-full animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-red-200/50 rounded-full animate-bounce" style={{animationDuration: '5s', animationDelay: '2s'}}></div>
+        <div className="absolute bottom-1/3 right-1/6 w-1 h-1 bg-red-100/70 rounded-full animate-bounce" style={{animationDuration: '3.5s', animationDelay: '1.5s'}}></div>
+      </div>
+
+      {/* Ondas decorativas más blancas */}
+      <div className="absolute inset-0">
+        <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+          <path d="M0,300 Q250,200 500,300 T1000,300 L1000,0 L0,0 Z" fill="url(#gradient1)" opacity="0.07"/>
+          <path d="M0,400 Q250,300 500,400 T1000,400 L1000,0 L0,0 Z" fill="url(#gradient2)" opacity="0.07"/>
+          <defs>
+            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fff" stopOpacity="0.2"/>
+              <stop offset="100%" stopColor="#fff" stopOpacity="0.05"/>
+            </linearGradient>
+            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fff" stopOpacity="0.1"/>
+              <stop offset="100%" stopColor="#fff" stopOpacity="0.03"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      {/* Grid pattern sutil más blanco */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+        backgroundSize: '40px 40px'
+      }}></div>
+
+      <Card className="w-full max-w-lg backdrop-blur-sm bg-white/90 border-0 shadow-2xl relative overflow-hidden z-10">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-red-600 to-red-700"></div>
 
         <CardHeader className="text-center space-y-4 pb-8 pt-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+          <div className="flex flex-col items-center justify-center mb-4">
+            <img src="/LOGOFESC.png" alt="Logo FESC" className="mx-auto mb-2 w-32 h-auto" />
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
           </div>
 
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
@@ -91,6 +141,9 @@ useEffect(() => {
                   className="border-red-200 focus:border-red-500 focus:ring-red-500 h-12 rounded-lg transition-all duration-200 hover:border-red-300"
                   required
                 />
+                {camposObligatorios && camposObligatorios.includes('preformv_nombres') && (
+                  <div className="text-red-600 text-sm mt-1">Este campo es obligatorio</div>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -113,6 +166,9 @@ useEffect(() => {
                   className="border-red-200 focus:border-red-500 focus:ring-red-500 h-12 rounded-lg transition-all duration-200 hover:border-red-300"
                   required
                 />
+                {camposObligatorios && camposObligatorios.includes('preformv_apellidos') && (
+                  <div className="text-red-600 text-sm mt-1">Este campo es obligatorio</div>
+                )}
               </div>
             </div>
 
@@ -132,6 +188,9 @@ useEffect(() => {
                 className="border-red-200 focus:border-red-500 focus:ring-red-500 h-12 rounded-lg transition-all duration-200 hover:border-red-300"
                 required
               />
+              {camposObligatorios && camposObligatorios.includes('preformv_correo') && (
+                <div className="text-red-600 text-sm mt-1">Este campo es obligatorio</div>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -147,20 +206,28 @@ useEffect(() => {
     </SelectTrigger>
     <SelectContent>
       {fuentes.map((fuente) => (
-    <SelectItem key={fuente.id} value={fuente.fuente}>
-    {fuente.fuente}
-  </SelectItem>
-))}
-
+        <SelectItem key={fuente.id} value={fuente.fuente}>
+          {fuente.fuente}
+        </SelectItem>
+      ))}
     </SelectContent>
   </Select>
+  {camposObligatorios && camposObligatorios.includes('preformv_fuentes') && (
+    <div className="text-red-600 text-sm mt-1">Este campo es obligatorio</div>
+  )}
 </div>
 
 
             <Button
             onClick={async () => {
+                const vacios: string[] = [];
+                if (!formData.preformv_nombres) vacios.push('preformv_nombres');
+                if (!formData.preformv_apellidos) vacios.push('preformv_apellidos');
+                if (!formData.preformv_correo) vacios.push('preformv_correo');
+                if (!formData.preformv_fuentes) vacios.push('preformv_fuentes');
+                setCamposObligatorios(vacios);
+                if (vacios.length > 0) return;
                 setLoading(true);
-
                 try {
                 await formularioService.postGuardarPreinscripcion(formData);
                 Swal.fire({

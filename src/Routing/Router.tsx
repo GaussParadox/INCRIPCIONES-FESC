@@ -5,19 +5,79 @@ import ProgramasPage from '@/pages/Programas/Programas'
 import Form from '@/pages/Inicio/form'
 import Preform from '@/pages/Inicio/preform'
 import Dashboard from '@/pages/Inicio/Dashboard'
+import Analiticas from '@/pages/Analiticas/Analiticas'
+import LoginForm from '@/pages/Inicio/login'
+import ProtectedRoute from '@/components/ProtectedRoute' // Asegúrate de tener esta ruta correcta
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Inicio />} />
-        <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/form' element={<Form />} />
-        <Route path='/preform' element={<Preform />} />
-        <Route path='/users/:id' element={<SingleUser />} />
-        <Route path='/users' element={<UsersPage />} />
-        <Route path='/programas' element={<ProgramasPage />} />
+        <Route path='/login' element={<LoginForm />} />
+
+        <Route
+          path='/'
+          element={
+            <ProtectedRoute>
+              <Inicio />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/dashboard'
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/form'
+          element={
+              <Form />
+          }
+        />
+        <Route
+          path='/preform'
+          element={
+              <Preform />
+      
+          }
+        />
+        <Route
+          path='/users/:id'
+          element={
+            <ProtectedRoute>
+              <SingleUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/users'
+          element={
+            <ProtectedRoute>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/programas'
+          element={
+            <ProtectedRoute>
+              <ProgramasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/analiticas'
+          element={
+            <ProtectedRoute>
+              <Analiticas />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

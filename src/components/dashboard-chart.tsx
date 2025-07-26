@@ -25,32 +25,49 @@ export function DashboardChart({ data }: DashboardChartProps) {
     )
   }
 
+  const chartHeight = Math.max(data.length * 70, 350);
+
   return (
-    <div className="h-[350px] w-full">
+    <div style={{ height: chartHeight, width: "100%" }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-          <XAxis dataKey="programa" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} angle={-35} textAnchor="end" interval={0} />
-          <YAxis
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ top: 30, right: 10, left: 30, bottom: 20 }}
+          barCategoryGap={10}
+        >
+          <XAxis
+            type="number"
+            orientation="top"
             stroke="#888888"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <YAxis
+            type="category"
+            dataKey="programa"
+            stroke="#888888"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            width={150}
+          />
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} />
           <Tooltip
             formatter={(value: number) => [value, "Inscritos"]}
             contentStyle={{
-              backgroundColor: "#ffffffff",
+              backgroundColor: "#ffffff",
               borderColor: "#000000",
               borderRadius: "var(--radius)",
             }}
             labelStyle={{ color: "#000000" }}
             itemStyle={{ color: "#000000" }}
           />
-
-          <Bar dataKey="total" fill="#EF4444" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="total" fill="#EF4444" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
   )
 }
+
