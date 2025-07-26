@@ -22,6 +22,22 @@ export interface Formulario {
   formv_year?: number;
   formv_egresado?: 'SI' | 'NO';
   formv_forma_pago?: string;
+  formv_firma_base64?: string;
+  formv_documento_base64?: string;
+  formv_comprobante_pago_base64?: string;
+}
+
+export interface PreForm {
+  preformv_nombres: string;
+  preformv_apellidos: string;
+  preformv_correo: string;
+  preformv_fuentes: string;
+}
+
+
+export interface Fuente {
+  id: number;
+  fuente: string;
 }
 
 export interface Programa {
@@ -29,3 +45,48 @@ export interface Programa {
   programa: string;
 }
 
+export interface ProgramaResumen {
+  formn_id: number;
+  formv_nombre_prog_formacion: string;
+  formv_nombres: string;
+  formv_apellidos: string;
+  formd_fecha: string;
+  formv_identificacion: string;
+  formv_correo_postulante: string;
+  formv_celular: string;
+  formv_forma_pago: string;
+  fecha_formateada: string;
+}
+
+export interface TotalInscritos {
+  total: number;
+}
+
+export interface ConteoPorPrograma {
+  programa: string;
+  total: number;
+}
+export interface ConteoPorfuente {
+  fuente: string;
+  total: number;
+}
+
+export interface TotalProgramas {
+  total: number;
+}
+
+export interface ProgramaMasInscritos {
+  programa: string;
+  total_inscritos: number;
+}
+
+export interface FuenteMasInscritos {
+  fuente: string;
+  total_inscritos: number;
+}
+
+export interface UsuariosAdministradores {
+  id: number;
+  email: string;
+  password: string;
+}
