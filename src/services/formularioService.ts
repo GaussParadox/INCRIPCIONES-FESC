@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Formulario, ConteoPorfuente ,Programa, ProgramaResumen, ConteoPorPrograma, TotalInscritos, TotalProgramas, ProgramaMasInscritos, Fuente, PreForm, FuenteMasInscritos  } from '../models/Formulario';
 
-const apiBaseURL = 'http://localhost:3000/api/form';
+const apiBaseURL = `${import.meta.env.VITE_API_URL}/form`;
 
 export const formularioService = {
 
